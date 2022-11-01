@@ -17,6 +17,7 @@ def process_image_MT(in_img, template):
 
 def process_image_SIFT(img1, img2):
     MIN_MATCH_COUNT = 10
+    MAX_DISTANCE = 0.6
     sift = cv.SIFT_create()
     kp1, des1 = sift.detectAndCompute(img1,None)                # Здесь kp будет списком ключевых точек, а des — масивом формата numpy.(Количество ключевых точек) × 128
     kp2, des2 = sift.detectAndCompute(img2,None)
@@ -28,7 +29,7 @@ def process_image_SIFT(img1, img2):
 
     good = []
     for m,n in matches:
-        if m.distance < 0.7*n.distance:         # distance - Расстояние между дескрипторами
+        if m.distance < MAX_DISTANCE*n.distance:         # distance - Расстояние между дескрипторами
             good.append(m)     
             
     if len(good) > MIN_MATCH_COUNT:
@@ -42,9 +43,7 @@ def process_image_SIFT(img1, img2):
         return (min_x, min_y), (max_x,max_y)
 
     else:
-        print( "Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
-        matchesMask = None    
-        return 
+        raise Exception("Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
         
 
 class Ui_MainWindow(object):
@@ -102,7 +101,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
 
-        self.spinBox.setValue(4)
+        
         self.comboBox.addItem('Template Matching')
         self.comboBox.addItem('Feature Matching SIFT')
 
@@ -114,6 +113,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.spinBox.valueChanged.connect(self.process)
         self.comboBox.currentIndexChanged.connect(self.process)
+        self.spinBox.setValue(1)
         self.process()
       
     def process(self):
@@ -122,7 +122,7 @@ class Ui_MainWindow(object):
         in_img = cv.imread('Lab2/img/' + str(i) +'.jpg',0)
         template = cv.imread('Lab2/template/' + str(i) +'.jpg',0)
         if type(in_img) != np.ndarray and type(template) != np.ndarray:
-            self.statusbar.showMessage("NoN") 
+            self.statusbar.showMessage("Image not found") 
             return
         try:
             if self.comboBox.currentText() == 'Template Matching':
@@ -132,6 +132,7 @@ class Ui_MainWindow(object):
                 foo = process_image_SIFT       
                 # in_img = process_image_SIFT(in_img, template)
             x,y = foo(in_img, template)
+            
             in_img = cv.imread('Lab2/img/' + str(i) +'.jpg')
             temp = cv.imread('Lab2/template/' + str(i) +'.jpg')
             cv.rectangle(in_img, x, y, (0,0,255), 2)
