@@ -1,9 +1,9 @@
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
-img_rgb = cv.imread('Lab2/img/1.jpg')
+img_rgb = cv.imread('Lab2/img/3.jpg')
 img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
-template = cv.imread('Lab2/template/1.jpg',0)
+template = cv.imread('Lab2/template/3.jpg',0)
 w, h = template.shape[::-1]
 res = cv.matchTemplate(img_gray,template,cv.TM_CCOEFF_NORMED)
 threshold = 0.8
