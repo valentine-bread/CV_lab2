@@ -16,8 +16,8 @@ def process_image_MT(in_img, template):
     return max_loc, (max_loc[0] + w, max_loc[1] + h) 
 
 def process_image_SIFT(img1, img2):
-    MIN_MATCH_COUNT = 10
-    MAX_DISTANCE = 0.6
+    MIN_MATCH_COUNT = 8
+    MAX_DISTANCE = 0.65
     sift = cv.SIFT_create()
     kp1, des1 = sift.detectAndCompute(img1,None)                # Здесь kp будет списком ключевых точек, а des — масивом формата numpy.(Количество ключевых точек) × 128
     kp2, des2 = sift.detectAndCompute(img2,None)
@@ -32,7 +32,7 @@ def process_image_SIFT(img1, img2):
         if m.distance < MAX_DISTANCE*n.distance:         # distance - Расстояние между дескрипторами
             good.append(m)     
             
-    if len(good) > MIN_MATCH_COUNT:
+    if len(good) >= MIN_MATCH_COUNT:
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)  # queryIdx - Index of the descriptor in query descriptors
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)  # trainIdx — Index of the descriptor in train descriptors
         _, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)    
