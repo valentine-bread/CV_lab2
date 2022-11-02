@@ -25,17 +25,17 @@ def process_image_SIFT(img1, img2):
     index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5) # Выбор алгоритма для sift
     search_params = dict(checks = 50)                           # Количество обходов дерева 
     flann = cv.FlannBasedMatcher(index_params, search_params)   # (FLANN) Быстрая библиотека для приближенных ближайших соседей
-    matches = flann.knnMatch(des1,des2,k=2)     
+    matches = flann.knnMatch(des1,des2,k=2)                     # Возвращает к пар лучших совпадений для каждой точки   
 
     good = []
     for m,n in matches:
-        if m.distance < MAX_DISTANCE*n.distance:         # distance - Расстояние между дескрипторами
+        if m.distance < MAX_DISTANCE*n.distance:         # distance - Расстояние(метрика) между дескрипторами
             good.append(m)     
             
     if len(good) >= MIN_MATCH_COUNT:
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)  # queryIdx - Index of the descriptor in query descriptors
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)  # trainIdx — Index of the descriptor in train descriptors
-        _, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)    
+        _, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)    # Отбрасывает выбросы на изображении 
          
         pts = src_pts[mask==1]
         min_x, min_y = np.int32(pts.min(axis=0))

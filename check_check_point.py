@@ -1,13 +1,15 @@
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
+
+i = int(input())
 MIN_MATCH_COUNT = 10
 # img1_i = cv.imread('Lab2/img/5.jpg')          # queryImage
 # img2_i = cv.imread('Lab2/template/4.jpg') # trainImage
 # img1 = cv.cvtColor(img1_i, cv.COLOR_BGR2GRAY)
 # img2 = cv.cvtColor(img2_i, cv.COLOR_BGR2GRAY)
-img1 = cv.imread('Lab2/img/8.jpg', 0)   
-img2 = cv.imread('Lab2/template/8.jpg', 0)
+img1 = cv.imread('Lab2/img/' + str(i) + '.jpg', 0)   
+img2 = cv.imread('Lab2/template/' + str(i) + '.jpg', 0)
 # Initiate SIFT detector
 sift = cv.SIFT_create()
 # find the keypoints and descriptors with SIFT
@@ -31,7 +33,7 @@ if len(good)>MIN_MATCH_COUNT:
     matchesMask = mask.ravel().tolist()
     h,w = img1.shape
     pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-    dst = cv.perspectiveTransform(pts,M)
+    dst = cv.perspectiveTransform(pts,M)        
     img2 = cv.polylines(img2,[np.int32(dst)],True,255,3, cv.LINE_AA)
 else:
     print( "Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT) )
